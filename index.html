@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="public/style.css">
+    <title>DRAC'S POKEDEX</title>
+    <link rel="icon" href="https://cdn.icon-icons.com/icons2/851/PNG/512/pokemon_moltres_icon-icons.com_67518.png" type="image/png">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            cursor: none;
+        }
+        #charizard-cursor {
+            position: fixed;
+            width: 90px; /* Increased width */
+            height: 90px; /* Increased height */
+            background-image: url('https://media.tenor.com/IL6LH7ayzAgAAAAi/charizard.gif');
+            background-size: cover;
+            z-index: 9999;
+            pointer-events: none;
+            display: none;
+        }
+        .loading {
+            display: block;
+            margin: 20px auto;
+            width: 50px;
+            height: 50px;
+            background-image: url('https://flipanim.com/gif/9/c/9czwuOXy.gif'); /* Loading GIF URL */
+            background-size: cover;
+        }
+    </style>
+</head>
+<body>
+    <div id="charizard-cursor"></div>
+    <header class="header">
+        <h1>DRAC'S POKEDEX</h1>
+    </header>
+    <main>
+        <section class="search-section">
+            <div class="search-bar">
+                <input id="search" type="search" placeholder="🔍 Search for a Pokémon..." class="pokemon-search">
+            </div>
+        </section>
+        <section id="app" class="pokemon-list">
+            <!-- Pokémon cards will be dynamically added here -->
+        </section>
+    </main>
+    <div class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2 class="modal-pokemon-name"></h2>
+            <div class="modal-info">
+                <p><span class="label">National No.:</span> <span class="national-no"></span></p>
+                <p><span class="label">Type:</span> <span class="type"></span></p>
+                <p><span class="label">Species:</span> <span class="species"></span></p>
+                <p><span class="label">Height:</span> <span class="height"></span></p>
+                <p><span class="label">Weight:</span> <span class="weight"></span></p>
+                <p><span class="label">Abilities:</span> <span class="abilities"></span></p>
+                <p><span class="label">Moves:</span> <span class="moves"></span></p>
+                <p><span class="label">Local No.:</span> <span class="local-no"></span></p>
+            </div>
+            <div class="modal-info">
+                <h3>Base Stats:</h3>
+                <div class="chart-container">
+                    <canvas id="pokemonStatsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <script src="public/js/ajaxHandler.js" type="module"></script>
+    <script src="public/js/app.js" type="module"></script>
+    <script>
+        $(document).ready(function () {
+            $('#charizard-cursor').show();
+            $(document).on('mousemove', function(event) {
+                $('#charizard-cursor').css({
+                    left: event.pageX - 45, /* Half of the width */
+                    top: event.pageY - 45 /* Half of the height */
+                });
+            });
+            $(document).on('mouseenter', '.card, .close-button', function() {
+                $('#charizard-cursor').css('background-image', 'url("https://media.tenor.com/IL6LH7ayzAgAAAAi/charizard-click.gif")');
+            });
+            $(document).on('mouseleave', '.card, .close-button', function() {
+                $('#charizard-cursor').css('background-image', 'url("https://media.tenor.com/IL6LH7ayzAgAAAAi/charizard.gif")');
+            });
+            $(document).on('mouseenter', 'body', function() {
+                $('#charizard-cursor').show();
+            });
+            $(document).on('mouseleave', 'body', function() {
+                $('#charizard-cursor').hide();
+            });
+            $(document).on('mousedown', function() {
+                $('#charizard-cursor').css('background-image', 'url("https://media.tenor.com/IL6LH7ayzAgAAAAi/charizard-click.gif")');
+            });
+            $(document).on('mouseup', function() {
+                $('#charizard-cursor').css('background-image', 'url("https://media.tenor.com/IL6LH7ayzAgAAAAi/charizard.gif")');
+            });
+        });
+    </script>
+</body>
+</html>
