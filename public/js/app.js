@@ -56,7 +56,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Function to display Pokémon cards
     function displayPokemon() {
-        console.log("All Pokemon:", allPokemon); // Check if allPokemon is populated
+        const loadingSpinner = document.querySelector('.loading-spinner');
+        isLoading = true;
+        if (loadingSpinner)
+            loadingSpinner.classList.add('show');
+
         const searchQuery = document.getElementById('search').value.toLowerCase();
         const filteredPokemon = allPokemon.filter(pokemon => {
             const nameMatch = pokemon.name.toLowerCase().includes(searchQuery);
@@ -75,6 +79,11 @@ document.addEventListener("DOMContentLoaded", function () {
             isLoading = false;
             if (loadingSpinner)
                 loadingSpinner.classList.remove('show');
+        }).then(() => {
+            const lastPokemonCard = document.querySelector('.pokemon-list').lastElementChild;
+            if (lastPokemonCard) {
+                observer.observe(lastPokemonCard);
+            }
         });
     }
 
@@ -272,10 +281,13 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Add scroll event to fetch next page
-    window.addEventListener('scroll', function () {
-        if (window.scrollY + window.innerHeight >= document.documentElement.scrollHeight) {
-            fetchNextPage();
-        }
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                fetchNextPage();
+                observer.unobserve(entry.target);
+            }
+        });
     });
 
     // Show Pokemon ID on hover
@@ -291,4 +303,3 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
-
