@@ -7,29 +7,6 @@
     <title>DRAC'S POKEDEX</title>
     <link rel="icon" href="https://cdn.icon-icons.com/icons2/851/PNG/512/pokemon_moltres_icon-icons.com_67518.png" type="image/png">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <style>
-        body {
-            cursor: none;
-        }
-        #charizard-cursor {
-            position: fixed;
-            width: 90px; /* Increased width */
-            height: 90px; /* Increased height */
-            background-image: url('https://media.tenor.com/IL6LH7ayzAgAAAAi/charizard.gif');
-            background-size: cover;
-            z-index: 9999;
-            pointer-events: none;
-            display: none;
-        }
-        .loading {
-            display: block;
-            margin: 20px auto;
-            width: 50px;
-            height: 50px;
-            background-image: url('https://flipanim.com/gif/9/c/9czwuOXy.gif'); /* Loading GIF URL */
-            background-size: cover;
-        }
-    </style>
 </head>
 <body>
     <div id="charizard-cursor"></div>
@@ -59,6 +36,10 @@
                 <p><span class="label">Abilities:</span> <span class="abilities"></span></p>
                 <p><span class="label">Moves:</span> <span class="moves"></span></p>
                 <p><span class="label">Local No.:</span> <span class="local-no"></span></p>
+                <p><span class="label">Catch Rate:</span> <span class="catch-rate"></span></p>
+                <p><span class="label">Gender Ratio:</span> <span class="gender-ratio"></span></p>
+                <p><span class="label">Pokemon ID:</span> <span class="pokemon-id"></span></p>
+                <p><span class="label">Experience Level:</span> <span class="experience-level"></span></p>
             </div>
             <div class="modal-info">
                 <h3>Base Stats:</h3>
@@ -72,31 +53,41 @@
     <script src="public/js/ajaxHandler.js" type="module"></script>
     <script src="public/js/app.js" type="module"></script>
     <script>
-        $(document).ready(function () {
-            $('#charizard-cursor').show();
-            $(document).on('mousemove', function(event) {
-                $('#charizard-cursor').css({
-                    left: event.pageX - 45, /* Half of the width */
-                    top: event.pageY - 45 /* Half of the height */
-                });
+        document.addEventListener("DOMContentLoaded", function () {
+            const charizardCursor = document.getElementById('charizard-cursor');
+            charizardCursor.style.display = "block";
+
+            document.addEventListener('mousemove', function (event) {
+                charizardCursor.style.left = event.pageX - 45 + 'px'; /* Half of the width */
+                charizardCursor.style.top = event.pageY - 45 + 'px'; /* Half of the height */
             });
-            $(document).on('mouseenter', '.card, .close-button', function() {
-                $('#charizard-cursor').css('background-image', 'url("https://media.tenor.com/IL6LH7ayzAgAAAAi/charizard-click.gif")');
+
+            document.addEventListener('mouseenter', function (event) {
+                if (event.target.classList.contains('card') || event.target.classList.contains('close-button')) {
+                    charizardCursor.style.backgroundImage = 'url("https://media.tenor.com/IL6LH7ayzAgAAAAi/charizard-click.gif")';
+                }
             });
-            $(document).on('mouseleave', '.card, .close-button', function() {
-                $('#charizard-cursor').css('background-image', 'url("https://media.tenor.com/IL6LH7ayzAgAAAAi/charizard.gif")');
+
+            document.addEventListener('mouseleave', function (event) {
+                if (event.target.classList.contains('card') || event.target.classList.contains('close-button')) {
+                    charizardCursor.style.backgroundImage = 'url("https://media.tenor.com/IL6LH7ayzAgAAAAi/charizard.gif")';
+                }
             });
-            $(document).on('mouseenter', 'body', function() {
-                $('#charizard-cursor').show();
+
+            document.addEventListener('mouseenter', function () {
+                charizardCursor.style.display = 'block';
             });
-            $(document).on('mouseleave', 'body', function() {
-                $('#charizard-cursor').hide();
+
+            document.addEventListener('mouseleave', function () {
+                charizardCursor.style.display = 'none';
             });
-            $(document).on('mousedown', function() {
-                $('#charizard-cursor').css('background-image', 'url("https://media.tenor.com/IL6LH7ayzAgAAAAi/charizard-click.gif")');
+
+            document.addEventListener('mousedown', function () {
+                charizardCursor.style.backgroundImage = 'url("https://media.tenor.com/IL6LH7ayzAgAAAAi/charizard-click.gif")';
             });
-            $(document).on('mouseup', function() {
-                $('#charizard-cursor').css('background-image', 'url("https://media.tenor.com/IL6LH7ayzAgAAAAi/charizard.gif")');
+
+            document.addEventListener('mouseup', function () {
+                charizardCursor.style.backgroundImage = 'url("https://media.tenor.com/IL6LH7ayzAgAAAAi/charizard.gif")';
             });
         });
     </script>

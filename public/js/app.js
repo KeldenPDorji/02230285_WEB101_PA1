@@ -1,6 +1,7 @@
-import AJAX from './ajaxHandler.js';
+// app.js
+import FetchHandler from './fetchHandler.js';
 
-const ajax = new AJAX();
+const fetchHandler = new FetchHandler();
 const pageSize = 20;
 let currentPage = 1;
 let allPokemon = [];
@@ -28,33 +29,35 @@ const typeColors = {
     fairy: { backgroundColor: 'rgba(214, 133, 173, 0.5)', statColor: 'rgba(214, 133, 173, 0.2)' }
 };
 
-$(document).ready(function () {
-    const $loadingSpinner = $('.loading-spinner');
+document.addEventListener("DOMContentLoaded", function () {
+    const loadingSpinner = document.querySelector('.loading-spinner');
 
     // Fetch all Pokémon data
-    ajax.GetJSON('https://pokeapi.co/api/v2/pokemon?limit=898', {}, (error, data) => {
-        if (error) {
+    fetchHandler.GetJSON('https://pokeapi.co/api/v2/pokemon?limit=898', {})
+        .then(data => {
+            console.log("Pokémon Data:", data); // Check if data is received
+            allPokemon = data.results;
+            displayPokemon();
+        })
+        .catch(error => {
             console.error('Error fetching Pokémon data:', error);
-            return;
-        }
-        allPokemon = data.results;
-        displayPokemon();
-    });
+        });
 
     // Debounce search input
     let searchTimeout;
-    $('#search').on('input', function () {
+    document.getElementById('search').addEventListener('input', function () {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
             currentPage = 1;
-            $('.pokemon-list').empty(); // Clear the existing Pokémon cards
+            document.querySelector('.pokemon-list').innerHTML = ''; // Clear the existing Pokémon cards
             displayPokemon();
         }, 300); // 300ms debounce
     });
 
     // Function to display Pokémon cards
     function displayPokemon() {
-        const searchQuery = $('#search').val().toLowerCase();
+        console.log("All Pokemon:", allPokemon); // Check if allPokemon is populated
+        const searchQuery = document.getElementById('search').value.toLowerCase();
         const filteredPokemon = allPokemon.filter(pokemon => {
             const nameMatch = pokemon.name.toLowerCase().includes(searchQuery);
             return nameMatch;
@@ -66,26 +69,29 @@ $(document).ready(function () {
             const idB = parseInt(b.url.split('/').slice(-2, -1)[0]);
             return idA - idB;
         });
-        paginatedPokemon.forEach((pokemon, index) => {
-            fetchAndDisplayPokemon(pokemon.url, index + 1 + startIndex);
+        Promise.all(paginatedPokemon.map((pokemon, index) => {
+            return fetchAndDisplayPokemon(pokemon.url, index + 1 + startIndex);
+        })).then(() => {
+            isLoading = false;
+            if (loadingSpinner)
+                loadingSpinner.classList.remove('show');
         });
     }
 
     // Function to fetch Pokémon details and display card
     function fetchAndDisplayPokemon(pokemonUrl, rank) {
         isLoading = true;
-        $loadingSpinner.addClass('show');
-        ajax.GetJSON(pokemonUrl, {}, (error, data) => {
-            isLoading = false;
-            $loadingSpinner.removeClass('show');
-            if (error) {
+        if (loadingSpinner)
+            loadingSpinner.classList.add('show');
+        return fetchHandler.GetJSON(pokemonUrl, {})
+            .then(data => {
+                const card = createPokemonCard(data, rank);
+                document.querySelector('.pokemon-list').appendChild(card);
+                card.classList.add('animate__animated', 'animate__fadeIn'); // Add animation
+            })
+            .catch(error => {
                 console.error('Error fetching Pokémon details:', error);
-                return;
-            }
-            const card = createPokemonCard(data, rank);
-            $('.pokemon-list').append(card);
-            card.addClass('animate__animated animate__fadeIn'); // Add animation
-        });
+            });
     }
 
     // Function to create Pokémon card
@@ -104,59 +110,66 @@ $(document).ready(function () {
             <div class="small-card">${move}</div>
         `).join('');
 
-        const pokemonCard = $(`
-            <div class="card" data-url="${data.url}" style="background-color: ${typeColors[types[0]].backgroundColor}">
-                <h2 class="poke-name">${data.name}</h2>
-                <h3 class="poke-id" style="position: absolute; top: 10px; left: 10px; font-family: 'Arial', sans-serif; color: white;">#${data.id}</h3>
-                <div class="card__inner">
-                    <div class="card__front">
-                        <img src="${pokemonIconUrl}" alt="${data.name}" class="card--image">
-                        <div class="card--details">
-                            <h3 class="card--abilities">Abilities:</h3>
-                            <div class="small-card-container">
-                                ${abilityCards}
-                            </div>
+        const pokemonCard = document.createElement('div');
+        pokemonCard.classList.add('card');
+        pokemonCard.dataset.url = data.url;
+        pokemonCard.style.backgroundColor = typeColors[types[0]].backgroundColor;
+        pokemonCard.innerHTML = `
+            <h2 class="poke-name">${data.name}</h2>
+            <div class="card__inner">
+                <div class="card__front">
+                    <img src="${pokemonIconUrl}" alt="${data.name}" class="card--image">
+                    <div class="card--details">
+                        <h3 class="card--abilities">Abilities:</h3>
+                        <div class="small-card-container">
+                            ${abilityCards}
                         </div>
                     </div>
-                    <div class="card__back">
-                        <p>Type: ${types.join(', ')}</p>
-                        <div class="card--details">
-                            <h3 class="card--moves">Moves:</h3>
-                            <div class="small-card-container">
-                                ${moveCards}
-                            </div>
+                </div>
+                <div class="card__back">
+                    <p>Type: ${types.join(', ')}</p>
+                    <div class="card--details">
+                        <h3 class="card--moves">Moves:</h3>
+                        <div class="small-card-container">
+                            ${moveCards}
                         </div>
                     </div>
                 </div>
             </div>
-        `);
+        `;
 
         // Add click event to show Pokemon details
-        pokemonCard.click(function () {
-            fetchBaseStatsAndShowModal(data);
+        pokemonCard.addEventListener('click', function () {
+            fetchPokemonDetailsAndShowModal(data);
         });
 
         return pokemonCard;
     }
 
-    // Function to fetch base stats and show modal
-    function fetchBaseStatsAndShowModal(data) {
-        ajax.GetJSON(data.species.url, {}, (error, speciesData) => {
-            if (error) {
+
+    // Function to fetch Pokemon details and show modal
+    function fetchPokemonDetailsAndShowModal(data) {
+        const baseStats = `
+            <div class="base-stats">
+                <canvas id="pokemonStatsChart"></canvas>
+            </div>
+        `;
+        fetchHandler.GetJSON(data.species.url, {})
+            .then(speciesData => {
+                showModal(data, baseStats, speciesData);
+            })
+            .catch(error => {
                 console.error('Error fetching species data:', error);
-                return;
-            }
-            const baseStats = `
-                <div class="base-stats">
-                    <canvas id="pokemonStatsChart"></canvas>
-                </div>
-            `;
-            showModal(data, baseStats);
-        });
+            });
     }
 
-    // Show modal with Pokemon details
-    function showModal(data, baseStats) {
+    // Function to show modal with Pokemon details
+    function showModal(data, baseStats, speciesData) {
+        const modal = document.querySelector('.modal');
+        const genderRate = getGenderRatio(speciesData.gender_rate);
+        const catchRate = speciesData.capture_rate;
+        const experienceLevel = speciesData.base_experience;
+        const pokemonId = data.id;
         const modalContent = `
             <div class="modal-content">
                 <span class="close-button">&times;</span>
@@ -164,9 +177,13 @@ $(document).ready(function () {
                 <div class="modal-details">
                     <img src="${data.sprites.other['official-artwork'].front_default}" alt="${data.name}" class="modal--image">
                     <div class="modal--details">
-                        <p>Type: ${data.types.map(type => type.type.name).join(', ')}</p>
+                        <p>Pokemon ID: ${pokemonId}</p>
+                        <p>Experience Level: ${experienceLevel}</p>
                         <p>Weight: ${data.weight / 10} kg</p>
                         <p>Height: ${data.height / 10} m</p>
+                        <p>Catch Rate: ${catchRate}%</p>
+                        <p>Gender Ratio: ${genderRate}</p>
+
                     </div>
                 </div>
                 <div class="additional-details">
@@ -176,15 +193,48 @@ $(document).ready(function () {
             </div>
         `;
 
-        $('.modal').html(modalContent);
+        modal.innerHTML = modalContent;
         const stats = data.stats.map(stat => stat.base_stat);
         displayStatsChart(stats, typeColors[data.types[0].type.name].statColor);
-        $('.modal').css('display', 'block');
+        modal.style.display = 'block';
 
         // Close modal
-        $('.close-button').click(() => {
-            $('.modal').css('display', 'none');
+        modal.querySelector('.close-button').addEventListener('click', () => {
+            modal.style.display = 'none';
         });
+    }
+
+    // Function to get gender ratio
+    function getGenderRatio(genderRate) {
+        let malePercentage = ((8 - genderRate) / 8) * 100;
+        let femalePercentage = 100 - malePercentage;
+        if (malePercentage < 0) {
+            malePercentage = 0;
+            femalePercentage = 100;
+        } else if (femalePercentage < 0) {
+            femalePercentage = 0;
+            malePercentage = 100;
+        }
+        return `${malePercentage.toFixed(2)}% ♂, ${femalePercentage.toFixed(2)}% ♀`;
+    }
+
+    // Function to get gender ratio
+    function getGenderRatio(genderRate) {
+        let malePercentage = ((8 - genderRate) / 8) * 100;
+        let femalePercentage = 100 - malePercentage;
+        if (malePercentage < 0) {
+            malePercentage = 0;
+            femalePercentage = 100;
+        } else if (femalePercentage < 0) {
+            femalePercentage = 0;
+            malePercentage = 100;
+        }
+        return `${malePercentage.toFixed(2)}% ♂, ${femalePercentage.toFixed(2)}% ♀`;
+    }
+
+    // Function to get catch rate in percentage
+    function getCatchRatePercentage(catchRate) {
+        return ((100 / 255) * catchRate).toFixed(2);
     }
 
     // Display chart of Pokemon stats
@@ -222,18 +272,23 @@ $(document).ready(function () {
     }
 
     // Add scroll event to fetch next page
-    $(window).scroll(function () {
-        if ($(window).scrollTop() + $(window).height() >= $(document).height()) {
+    window.addEventListener('scroll', function () {
+        if (window.scrollY + window.innerHeight >= document.documentElement.scrollHeight) {
             fetchNextPage();
         }
     });
 
     // Show Pokemon ID on hover
-    $('.pokemon-list').on('mouseenter', '.card', function () {
-        $(this).find('.poke-id').fadeIn();
+    document.querySelector('.pokemon-list').addEventListener('mouseenter', function (event) {
+        if (event.target.classList.contains('card')) {
+            event.target.querySelector('.poke-id').style.display = 'block';
+        }
     });
 
-    $('.pokemon-list').on('mouseleave', '.card', function () {
-        $(this).find('.poke-id').fadeOut();
+    document.querySelector('.pokemon-list').addEventListener('mouseleave', function (event) {
+        if (event.target.classList.contains('card')) {
+            event.target.querySelector('.poke-id').style.display = 'none';
+        }
     });
 });
+
