@@ -19,8 +19,6 @@ Welcome to Drac's Pokedex! This is a simple web-based Pokedex application where 
 - HTML
 - CSS
 - JavaScript
-- jQuery
-- Chart.js
 
 **How to Use:**
 
@@ -35,10 +33,6 @@ https://github.com/KeldenPDorji/WEB101_CAP1
 
 - Pokemon data is fetched from the [PokeAPI](https://pokeapi.co/).
 - Charizard cursor animation by [Tenor](https://tenor.com/).
-
-**Preview:**
-
-![Pokedex Preview](pokedex-preview.png)
 
 **Contributing:**
 
