@@ -24,7 +24,7 @@ Welcome to Drac's Pokedex! This is a simple web-based Pokedex application where 
 
 1. Clone the repository:
 
-https://github.com/KeldenPDorji/WEB101_CAP1
+git clone https://github.com/KeldenPDorji/WEB101_CAP1
 
 
 2. Open `index.html` in your web browser.
