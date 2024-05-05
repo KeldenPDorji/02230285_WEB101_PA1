@@ -36,13 +36,23 @@ body {
   display: none;
 }
 
-.loading {
-  display: block;
-  margin: 20px auto;
-  width: 50px;
-  height: 50px;
-  background-image: url('https://flipanim.com/gif/9/c/9czwuOXy.gif'); /* Loading GIF URL */
-  background-size: cover;
+.loading-spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-top: 4px solid #333;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 main > h1 {
@@ -242,10 +252,6 @@ main > h1 {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.pokemon-search::placeholder {
-  color: #999;
-}
-
 /* Pagination */
 .pagination {
   text-align: center;
@@ -338,4 +344,46 @@ main > h1 {
 
 .modal-info .label {
   font-weight: bold;
+}
+
+/* Charizard cursor styles */
+.charizard-cursor-click {
+  background-image: url('https://media.tenor.com/IL6LH7ayzAgAAAAi/charizard-click.gif');
+}
+
+.charizard-cursor {
+  display: block;
+}
+
+.charizard-cursor:hover,
+.card:hover .charizard-cursor {
+  background-image: url('https://media.tenor.com/IL6LH7ayzAgAAAAi/charizard.gif');
+}
+
+/* Media queries for responsiveness */
+
+@media only screen and (max-width: 768px) {
+  main {
+    padding: 0.5rem;
+  }
+
+  .card {
+    height: 300px;
+  }
+
+  .card--name {
+    font-size: clamp(1.2rem, 2vw, 1.8rem);
+  }
+
+  .card--details {
+    font-size: clamp(0.8rem, 1.5vw, 1rem);
+  }
+
+  .pokemon-search {
+    width: 90%;
+  }
+
+  .pagination {
+    margin-top: 10px;
+  }
 }
