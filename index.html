@@ -9,19 +9,30 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
-    <div id="charizard-cursor"></div>
+    <div id="charizard-cursor">
+        <img src="https://media.tenor.com/IL6LH7ayzAgAAAAi/charizard.gif" alt="Charizard" class="charizard-gif">
+    </div>
     <header class="header">
         <h1>DRAC'S POKEDEX</h1>
     </header>
     <main>
         <section class="search-section">
             <div class="search-bar">
-                <input id="search" type="search" placeholder="🔍 Search for a Pokémon..." class="pokemon-search">
+                <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="#9D4EDD" viewBox="0 0 24 24">
+                    <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                </svg>
+                <input id="search" type="text" placeholder="Search Pokémon by name or number... (e.g., Pikachu or 25)" class="pokemon-search" autocomplete="off">
             </div>
         </section>
         <section id="app" class="pokemon-list">
             <!-- Pokémon cards will be dynamically added here -->
         </section>
+        <div class="pagination-container">
+            <div class="pikachu-loader">
+                <img src="https://projectpokemon.org/images/normal-sprite/pikachu.gif" alt="Loading Pikachu" class="pikachu-gif">
+            </div>
+            <div class="loading-text" style="display: none;">⚡ Loading More Pokémon... ⚡</div>
+        </div>
     </main>
     <div class="modal">
         <div class="modal-content">
@@ -55,39 +66,58 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const charizardCursor = document.getElementById('charizard-cursor');
-            charizardCursor.style.display = "block";
+            const normalGif = 'https://i.gifer.com/origin/e6/e6e5c685b43195ea3741ce3be42dbc98_w200.gif';
+            const clickGif = 'https://i.gifer.com/origin/7f/7f87d92d7f4bbfb7b4b9b2f3f5a5e5f5_w200.gif';
+            
+            let isVisible = false;
 
+            // Show cursor on first mouse movement
             document.addEventListener('mousemove', function (event) {
-                charizardCursor.style.left = event.pageX - 45 + 'px'; /* Half of the width */
-                charizardCursor.style.top = event.pageY - 45 + 'px'; /* Half of the height */
-            });
+                if (!isVisible) {
+                    charizardCursor.style.display = "block";
+                    isVisible = true;
+                }
+                
+                // Use clientX/clientY for viewport-based positioning (stays with cursor during scroll)
+                charizardCursor.style.left = event.clientX + 'px';
+                charizardCursor.style.top = event.clientY + 'px';
+            }, { passive: true });
 
-            document.addEventListener('mouseenter', function (event) {
-                if (event.target.classList.contains('card') || event.target.classList.contains('close-button')) {
-                    charizardCursor.style.backgroundImage = 'url("https://media.tenor.com/IL6LH7ayzAgAAAAi/charizard-click.gif")';
+            // Change cursor on hover over interactive elements
+            document.addEventListener('mouseover', function (event) {
+                if (event.target.closest('.card') || 
+                    event.target.closest('.close-button') || 
+                    event.target.closest('.pokemon-search') ||
+                    event.target.closest('.small-card')) {
+                    charizardCursor.style.transform = 'translate(-50%, -50%) scale(1.2)';
                 }
             });
 
-            document.addEventListener('mouseleave', function (event) {
-                if (event.target.classList.contains('card') || event.target.classList.contains('close-button')) {
-                    charizardCursor.style.backgroundImage = 'url("https://media.tenor.com/IL6LH7ayzAgAAAAi/charizard.gif")';
+            document.addEventListener('mouseout', function (event) {
+                if (event.target.closest('.card') || 
+                    event.target.closest('.close-button') || 
+                    event.target.closest('.pokemon-search') ||
+                    event.target.closest('.small-card')) {
+                    charizardCursor.style.transform = 'translate(-50%, -50%) scale(1)';
                 }
             });
 
-            document.addEventListener('mouseenter', function () {
-                charizardCursor.style.display = 'block';
-            });
-
-            document.addEventListener('mouseleave', function () {
-                charizardCursor.style.display = 'none';
-            });
-
+            // Scale down on click
             document.addEventListener('mousedown', function () {
-                charizardCursor.style.backgroundImage = 'url("https://media.tenor.com/IL6LH7ayzAgAAAAi/charizard-click.gif")';
+                charizardCursor.style.transform = 'translate(-50%, -50%) scale(0.9)';
             });
 
             document.addEventListener('mouseup', function () {
-                charizardCursor.style.backgroundImage = 'url("https://media.tenor.com/IL6LH7ayzAgAAAAi/charizard.gif")';
+                charizardCursor.style.transform = 'translate(-50%, -50%) scale(1)';
+            });
+
+            // Hide cursor when leaving window
+            document.addEventListener('mouseleave', function () {
+                charizardCursor.style.opacity = '0';
+            });
+
+            document.addEventListener('mouseenter', function () {
+                charizardCursor.style.opacity = '1';
             });
         });
     </script>
