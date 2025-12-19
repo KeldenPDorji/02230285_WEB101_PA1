@@ -33,9 +33,3 @@ git clone https://github.com/KeldenPDorji/WEB101_CAP1
 
 - Pokemon data is fetched from the [PokeAPI](https://pokeapi.co/).
 - Charizard cursor animation by [Tenor](https://tenor.com/).
-
-**Contributing:**
-
-Contributions are welcome! Feel free to open issues or pull requests.
-
-
