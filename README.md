@@ -9,7 +9,7 @@
 
 **A stunning, interactive Pokédex featuring all 898 Pokémon with advanced search, detailed stats visualization, and a captivating dark gaming aesthetic.**
 
-[Live Demo](#) • [Features](#-features) • [Tech Stack](#-tech-stack) • [Installation](#-installation)
+[Live Demo](https://web101-cap1-ity8.onrender.com/#) • [Features](#-features) • [Tech Stack](#-tech-stack) • [Installation](#-installation)
 
 </div>
 
