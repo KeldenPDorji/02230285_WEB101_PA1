@@ -16,7 +16,7 @@
 ---
 
 ## 📸 Preview
-
+![alt text](v1.png)
 Experience a modern, cyberpunk-inspired Pokédex with smooth animations, custom cursors, and an immersive dark theme that brings the world of Pokémon to life.
 
 ## ✨ Features
